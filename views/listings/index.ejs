@@ -1,0 +1,221 @@
+<% layout("/layouts/boilerplate") %>
+
+  <style>
+    /* 🌟 TRULY STICKY & INLINE FILTER NAV MECHANICS */
+    #filters-container {
+      position: -webkit-sticky;
+      /* Safari support */
+      position: sticky;
+      top: 0;
+      background: #ffffff;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      padding: 0.6rem 0;
+      margin-bottom: 2rem;
+    }
+
+    /* Main row wrapper — toggle box is now the only item, align it right */
+    .filter-row-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      width: 100%;
+      gap: 1rem;
+    }
+
+    /* Left Side: Scrollable track for icons */
+    #filters {
+      display: flex;
+      align-items: center;
+      overflow-x: auto;
+      scrollbar-width: none;
+      /* Hide for Firefox */
+      flex-grow: 1;
+    }
+
+    #filters::-webkit-scrollbar {
+      display: none;
+      /* Hide for Chrome/Safari */
+    }
+
+    .filter-options {
+      display: flex;
+      align-items: center;
+      gap: 2.2rem;
+      padding: 0.2rem 0;
+    }
+
+    /* Premium Minimalist Filter Nodes matching the video */
+    .filter {
+      text-align: center;
+      opacity: 0.55;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      min-width: 55px;
+      border-bottom: 2px solid transparent;
+      padding-bottom: 4px;
+    }
+
+    .filter:hover,
+    .filter.active-filter {
+      opacity: 1;
+      color: #000000 !important;
+      border-bottom: 2px solid #000000 !important;
+    }
+
+    .filter i {
+      font-size: 1.35rem;
+      display: block;
+      margin-bottom: 0.2rem;
+      color: #222222;
+    }
+
+    .filter p {
+      font-size: 0.72rem;
+      font-weight: 500;
+      margin: 0;
+      color: #222222;
+      white-space: nowrap;
+    }
+
+    /* GST-inclusive price shown inline next to the base price */
+    .gst-inline {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #1B3B6D;
+      background: #fdf6e3;
+      border: 1px solid #E9D8A6;
+      border-radius: 8px;
+      padding: 1px 8px;
+      margin-left: 6px;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .peak-pricing-banner {
+      background: linear-gradient(90deg, #fdf6e3, #fff);
+      border: 1px solid #E9D8A6;
+      border-radius: 12px;
+      padding: 0.6rem 1rem;
+      font-size: 0.8rem;
+      color: #7a5b00;
+      margin-bottom: 1rem;
+    }
+
+    .form-check-input {
+      width: 2.5rem !important;
+      height: 1.35rem !important;
+      cursor: pointer;
+      margin-top: 0 !important;
+    }
+
+    .form-check-input:checked {
+      background-color: #222222 !important;
+      /* Airbnb/Apna College standard dark gray accent */
+      border-color: #222222 !important;
+    }
+
+    /* Premium Card Design Attributes */
+    .premium-card {
+      border: none !important;
+      border-radius: 1rem !important;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+      background: transparent;
+    }
+
+    .card-img-wrapper {
+      position: relative;
+      width: 100%;
+      height: 280px;
+      border-radius: 0.85rem;
+      overflow: hidden;
+    }
+
+    .premium-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .premium-card:hover img {
+      transform: scale(1.03);
+    }
+
+    .card-body {
+      padding: 0.65rem 0.25rem 0 0.25rem !important;
+    }
+
+    .card-title-text {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #222222;
+    }
+
+    .card-price-text {
+      font-size: 0.9rem;
+      color: #222222;
+      font-weight: 500;
+    }
+
+  </style>
+
+  <div class="container">
+    <div class="peak-pricing-banner">
+      <i class="bi bi-graph-up-arrow me-1"></i>
+      Prices shown are the base rate. During peak seasonal demand (major festivals & pilgrimage season), prices may rise
+      by roughly <strong>80–90%</strong> above the base rate — the final price is always confirmed at checkout.
+    </div>
+  </div>
+    <div class="row row-cols-xl-4 row-cols-lg-3 row-cols-md-2 row-cols-1 g-4">
+      <% if(allListings.length===0) { %>
+        <div class="col-12 text-center py-5">
+          <i class="bi bi-search fs-1 text-muted d-block mb-3"></i>
+          <h5 class="text-secondary fw-bold">No stays found matching this category</h5>
+          <p class="text-muted small">Try checking out "All Stays" to browse available options.</p>
+          <a href="/listings" class="btn btn-sm btn-outline-danger px-4 rounded-pill mt-2">View All Listings</a>
+        </div>
+        <% } else { %>
+          <% for(let listing of allListings) { %>
+            <div class="col">
+              <a href="/listings/<%= listing._id %>" class="text-decoration-none">
+                <div class="card premium-card h-100">
+                  <div class="card-img-wrapper">
+                    <img src="<%= listing.image.url %>" alt="listing_image" loading="lazy">
+                    <div style="position: absolute; top: 12px; right: 12px; z-index: 2;">
+                      <i class="bi bi-heart-fill fs-5"
+                        style="color: rgba(0,0,0,0.4); -webkit-text-stroke: 2px #ffffff; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); transition: color 0.2s;"
+                        onmouseover="this.style.color='#1B3B6D'" onmouseout="this.style.color='rgba(0,0,0,0.4)'"></i>
+                    </div>
+                  </div>
+
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                      <p class="card-title-text text-truncate mb-0" style="max-width: 85%;">
+                        <%= listing.title %>
+                      </p>
+                      <span class="text-muted small fw-medium"><i class="bi bi-star-fill text-warning me-1"
+                          style="font-size: 0.8rem;"></i>4.9</span>
+                    </div>
+                    <p class="text-muted small mb-1">
+                      <%= listing.location %>, <%= listing.country %>
+                    </p>
+
+                    <p class="card-price-text mb-0">
+                      <span class="base-price"><%= "\u20B9" %> <%= listing.price.toLocaleString("en-IN") %></span>
+                      <span class="price-suffix">/ night</span>
+                      <span class="gst-inline" title="Price including 18% GST">
+                        <i class="bi bi-arrow-up-short"></i><%= "\u20B9" %><%= Math.round(listing.price * 1.18).toLocaleString("en-IN") %> incl. GST
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </a>
+            </div>
+            <% } %>
+              <% } %>
+    </div>
+  </div>

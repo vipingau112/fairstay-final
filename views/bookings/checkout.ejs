@@ -1,0 +1,66 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container mt-4 mb-5" style="max-width: 620px;">
+  <h2 class="fw-bold mb-4">Confirm & Pay</h2>
+
+  <div class="card border-0 rounded-4 shadow-sm p-4 mb-4">
+    <div class="d-flex gap-3 mb-3">
+      <img src="<%= booking.listing.image.url %>" class="rounded-3 object-fit-cover" style="width: 110px; height: 90px;" alt="listing">
+      <div>
+        <h5 class="fw-bold mb-1"><%= booking.listing.title %></h5>
+        <p class="text-secondary small mb-0"><i class="bi bi-geo-alt-fill text-gold me-1"></i><%= booking.listing.location %>, <%= booking.listing.country %></p>
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="d-flex justify-content-between mb-2">
+      <span class="text-secondary">Check-in</span>
+      <span class="fw-medium"><%= booking.checkIn.toDateString() %></span>
+    </div>
+    <div class="d-flex justify-content-between mb-2">
+      <span class="text-secondary">Check-out</span>
+      <span class="fw-medium"><%= booking.checkOut.toDateString() %></span>
+    </div>
+    <div class="d-flex justify-content-between mb-2">
+      <span class="text-secondary">Guests</span>
+      <span class="fw-medium"><%= booking.guests %></span>
+    </div>
+
+    <% if (booking.festivalApplied) { %>
+      <div class="alert alert-warning small mt-3 mb-0 rounded-3">
+        <i class="bi bi-stars me-1"></i>
+        Fair seasonal pricing applied (<%= Math.round((booking.seasonalMultiplier - 1) * 100) %>% due to <strong><%= booking.festivalApplied %></strong>).
+      </div>
+    <% } %>
+
+    <hr>
+
+    <div class="d-flex justify-content-between mb-1 text-secondary small">
+      <span><%= booking.nights %> night(s) &times; &#8377;<%= Math.round(booking.pricePerNight * booking.seasonalMultiplier).toLocaleString("en-IN") %></span>
+      <span>&#8377;<%= booking.totalPrice.toLocaleString("en-IN") %></span>
+    </div>
+    <div class="d-flex justify-content-between fw-bold fs-5 text-dark mt-2">
+      <span>Total</span>
+      <span>&#8377;<%= booking.totalPrice.toLocaleString("en-IN") %></span>
+    </div>
+  </div>
+
+  <% if (stripeEnabled) { %>
+    <form method="POST" action="/bookings/<%= booking._id %>/pay">
+      <button class="btn btn-dark w-100 py-3 rounded-3 fw-medium">
+        <i class="bi bi-credit-card-fill me-2"></i>Pay &#8377;<%= booking.totalPrice.toLocaleString("en-IN") %> with Stripe
+      </button>
+    </form>
+    <p class="text-center text-muted small mt-2 mb-0">You'll be redirected to Stripe's secure checkout.</p>
+  <% } else { %>
+    <form method="POST" action="/bookings/<%= booking._id %>/confirm">
+      <button class="btn btn-outline-dark w-100 py-3 rounded-3 fw-medium">
+        <i class="bi bi-check-circle me-2"></i>Simulate Payment (Test Mode)
+      </button>
+    </form>
+    <p class="text-center text-muted small mt-2 mb-0">
+      Stripe isn't configured yet, so this simulates a successful payment for local testing.
+    </p>
+  <% } %>
+</div>

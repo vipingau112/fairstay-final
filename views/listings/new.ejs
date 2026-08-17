@@ -1,0 +1,55 @@
+<% layout("/layouts/boilerplate") %>
+<div class="row mt-3 mb-5 justify-content-center">
+  <div class="col-lg-6 col-md-8 col-12">
+    <h2 class="fw-bold text-dark mb-4 text-center">Create a New Listing</h2>
+    <div class="card p-4 border rounded-4 bg-white shadow-sm">
+      <form method="POST" action="/listings" novalidate class="needs-validation" enctype="multipart/form-data">
+        <div class="mb-3">
+          <label for="title" class="form-label fw-medium text-secondary">Listing Title</label>
+          <input name="listing[title]" placeholder="Enter a catchy title..." type="text" class="form-control rounded-3" required />
+          <div class="invalid-feedback">Please enter a valid title!</div>
+        </div>
+        
+        <div class="mb-3">
+          <label for="description" class="form-label fw-medium text-secondary">Description Context</label>
+          <textarea name="listing[description]" placeholder="Describe the ambiance, rooms, views, and surroundings..." class="form-control rounded-3" rows="4" required></textarea>
+          <div class="invalid-feedback">Please include a descriptive background message detail context!</div>
+        </div>
+        
+        <div class="mb-3">
+          <label for="image" class="form-label fw-medium text-secondary">Upload Listing Image File</label>
+          <input name="listing[image]" type="file" class="form-control rounded-3" required />
+          <div class="invalid-feedback">Please select a valid local preview image file to upload!</div>
+        </div>
+        
+        <div class="row g-3 mb-3">
+          <div class="col-md-6 col-12">
+            <label for="price" class="form-label fw-medium text-secondary">Price Per Night</label>
+            <div class="input-group">
+              <span class="input-group-text rounded-start-3">&#8377;</span>
+              <input id="listing-price" name="listing[price]" placeholder="1200" type="number" class="form-control rounded-end-3" required />
+              <div class="invalid-feedback">Please declare a valid operational price cost margin standard!</div>
+            </div>
+          </div>
+          <div class="col-md-6 col-12">
+            <label for="country" class="form-label fw-medium text-secondary">Country Destination</label>
+            <input id="listing-country" name="listing[country]" placeholder="India" type="text" class="form-control rounded-3" required />
+            <div class="invalid-feedback">Please assign a structural regional landing destination country location!</div>
+          </div>
+        </div>
+        
+        <div class="mb-2">
+          <label for="location" class="form-label fw-medium text-secondary">Exact Location / State Address</label>
+          <input id="listing-location" name="listing[location]" placeholder="Goa, Maharashtra" type="text" class="form-control rounded-3" required />
+          <div class="invalid-feedback">Please append a verifiable map physical coordinate registry address location point!</div>
+        </div>
+
+        <%- include("../includes/priceSuggestion.ejs") %>
+
+        <button class="btn btn-dark w-100 py-2.5 rounded-3 fw-medium add-btn shadow-sm mt-3">
+          <i class="bi bi-plus-circle me-1"></i>Publish Listing Profile
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

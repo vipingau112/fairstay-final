@@ -1,0 +1,321 @@
+<% layout("/layouts/boilerplate") %>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<style>
+  /* Starability rating field layout overrides */
+  .starability-basic {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    position: relative;
+    width: 100%;
+    min-height: 40px;
+    padding: 0;
+    border: none;
+  }
+  .starability-basic > input {
+    position: absolute;
+    opacity: 0;
+  }
+  .starability-basic > label {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    color: transparent;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23E2E8F0'%3E%3Cpath d='M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: contain;
+    transition: all 0.2s ease-in-out;
+  }
+  .starability-basic > input:checked ~ label {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFB000'%3E%3Cpath d='M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z'/%3E%3C/svg%3E");
+    transform: scale(1.05);
+  }
+  .starability-basic > label:hover ~ label,
+  .starability-basic > label:hover {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFC72C'%3E%3Cpath d='M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z'/%3E%3C/svg%3E") !important;
+    transform: scale(1.15);
+  }
+  .static-stars {
+    color: #FFB000;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+  }
+
+  /* Sticky Column Layout for Large Screens */
+  @media (min-width: 992px) {
+    .sticky-media-column {
+      position: sticky;
+      top: 100px;
+      height: fit-content;
+    }
+  }
+
+  /* Premium Design Utilities */
+  .premium-show-card {
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.04) !important;
+    border: 1px solid rgba(0, 0, 0, 0.04) !important;
+  }
+  .detail-box {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 1rem;
+    transition: all 0.25s ease;
+  }
+  .detail-box:hover {
+    background: #f1f3f5;
+    transform: translateY(-2px);
+  }
+</style>
+
+<div class="container mt-4 mb-5">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h1 class="fw-bold text-dark mb-1" style="letter-spacing: -0.8px;"><%= listing.title %></h1>
+    </div>
+  </div>
+
+  <div class="row g-5">
+    
+    <div class="col-lg-5 col-12">
+      <div class="sticky-media-column">
+        <div class="card premium-show-card border-0 rounded-4 overflow-hidden p-0 mb-4">
+          <img src="<%= listing.image.url %>" class="w-100 object-fit-cover" style="height: 380px;" alt="listing_image">
+          
+          <div class="card-body p-3 bg-white border-top">
+            <div class="d-flex align-items-center justify-content-between">
+              <span class="badge bg-light text-dark border px-3 py-2 rounded-pill fs-6 fw-normal">
+                <i class="bi bi-person-circle me-2 text-secondary"></i>
+                Hosted by <strong><%= (listing.owner && listing.owner.username) ? listing.owner.username : "Anonymous" %></strong>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <%
+          let showBookingWidget = false;
+          if (currUser && listing.owner) {
+            let ownerId = listing.owner._id ? listing.owner._id.toString() : listing.owner.toString();
+            showBookingWidget = currUser._id.toString() !== ownerId;
+          }
+        %>
+
+        <div class="card premium-show-card border-0 rounded-4 bg-white p-4 mb-4">
+          <h5 class="fw-bold text-dark mb-3"><i class="bi bi-calendar-check me-2 text-gold"></i>Book this stay</h5>
+
+          <% if (!currUser) { %>
+            <p class="text-secondary small mb-3">Log in to reserve your dates.</p>
+            <a href="/login" class="btn btn-dark w-100 rounded-3 fw-medium">Log in to Book</a>
+          <% } else if (!showBookingWidget) { %>
+            <p class="text-secondary small mb-0">This is your own listing, so you can't book it.</p>
+          <% } else { %>
+            <form id="booking-form" method="POST" action="/listings/<%= listing._id %>/bookings" novalidate>
+              <div class="row g-2 mb-2">
+                <div class="col-6">
+                  <label class="form-label small fw-medium text-secondary mb-1">Check-in</label>
+                  <input type="date" id="booking-checkin" name="booking[checkIn]" class="form-control rounded-3" required>
+                </div>
+                <div class="col-6">
+                  <label class="form-label small fw-medium text-secondary mb-1">Check-out</label>
+                  <input type="date" id="booking-checkout" name="booking[checkOut]" class="form-control rounded-3" required>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label small fw-medium text-secondary mb-1">Guests</label>
+                <input type="number" id="booking-guests" name="booking[guests]" min="1" value="1" class="form-control rounded-3" required>
+              </div>
+              <div class="row g-2 mb-2">
+                <div class="col-6">
+                  <label class="form-label small fw-medium text-secondary mb-1">Guest name</label>
+                  <input type="text" name="booking[guestName]" class="form-control rounded-3" value="<%= currUser.username %>" required>
+                </div>
+                <div class="col-6">
+                  <label class="form-label small fw-medium text-secondary mb-1">Guest email</label>
+                  <input type="email" name="booking[guestEmail]" class="form-control rounded-3" value="<%= currUser.email %>" required>
+                </div>
+              </div>
+
+              <div id="booking-price-breakdown" class="small text-secondary mb-3" style="display:none;">
+                <div class="d-flex justify-content-between">
+                  <span><span id="booking-nights">0</span> night(s) &times; &#8377;<%= listing.price.toLocaleString("en-IN") %></span>
+                  <span id="booking-subtotal">&#8377;0</span>
+                </div>
+                <hr class="my-2">
+                <div class="d-flex justify-content-between fw-bold text-dark">
+                  <span>Total</span>
+                  <span id="booking-total">&#8377;0</span>
+                </div>
+                <p class="text-muted mb-0 mt-1" style="font-size: 0.7rem;">
+                  <i class="bi bi-info-circle me-1"></i>Estimate — final price may include a seasonal festival adjustment, shown at checkout.
+                </p>
+              </div>
+
+              <div class="alert alert-warning py-2 px-3 mb-3" style="font-size: 0.72rem;">
+                <i class="bi bi-graph-up-arrow me-1"></i>
+                Prices can rise <strong>80–90%</strong> above the base rate during peak seasonal demand (major festivals & pilgrimage season).
+              </div>
+
+              <button type="submit" class="btn btn-dark w-100 rounded-3 fw-medium py-2">
+                <i class="bi bi-lock-fill me-1"></i>Reserve Now
+              </button>
+            </form>
+          <% } %>
+        </div>
+      </div>
+    </div>
+    <script>document.body.dataset.listingPrice = "<%= listing.price %>";</script>
+    <script src="/js/booking.js"></script>
+
+    <div class="col-lg-7 col-12">
+      <div class="card premium-show-card border-0 rounded-4 bg-white p-4 p-md-5 mb-4">
+        <h4 class="fw-bold text-dark mb-3">About this destination</h4>
+        <p class="text-secondary lead fs-5 mb-4 border-bottom pb-4" style="line-height: 1.6;">
+          <%= listing.description %>
+        </p>
+
+        <% 
+          let isOwner = false;
+          if (currUser && listing.owner) {
+             let ownerId = listing.owner._id ? listing.owner._id.toString() : listing.owner.toString();
+             if (currUser._id.toString() === ownerId) {
+                isOwner = true;
+             }
+          }
+        %>
+
+        <% if (isOwner) { %>
+          <div class="d-flex gap-3 mb-4 pb-4 border-bottom">
+            <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark px-4 py-2 rounded-3 fw-medium shadow-sm">
+              <i class="bi bi-pencil-square me-1"></i> Edit Space
+            </a>
+            <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE" class="d-inline">
+              <button class="btn btn-danger px-4 py-2 rounded-3 fw-medium shadow-sm">
+                <i class="bi bi-trash3-fill me-1"></i> Delete Space
+              </button>
+            </form>
+          </div>
+        <% } %>
+        
+        <div class="row g-3 text-secondary">
+          <div class="col-md-4 col-6">
+            <div class="p-3 detail-box">
+              <small class="text-uppercase tracking-wider fw-bold text-muted d-block mb-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">Price per Night</small>
+              <span class="fs-4 fw-bold text-dark">&#8377; <%= listing.price.toLocaleString("en-IN") %></span>
+              <span class="badge rounded-pill ms-1" style="background:#fdf6e3;color:#1B3B6D;border:1px solid #E9D8A6;font-size:0.7rem;font-weight:600;" title="Price including 18% GST">
+                <i class="bi bi-arrow-up-short"></i>&#8377;<%= Math.round(listing.price * 1.18).toLocaleString("en-IN") %> incl. GST
+              </span>
+            </div>
+          </div>
+          <div class="col-md-4 col-6">
+            <div class="p-3 detail-box">
+              <small class="text-uppercase tracking-wider fw-bold text-muted d-block mb-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">Location</small>
+              <span class="fs-5 fw-bold text-dark text-truncate d-block"><i class="bi bi-geo-alt-fill text-gold me-1"></i><%= listing.location %></span>
+            </div>
+          </div>
+          <div class="col-md-4 col-12">
+            <div class="p-3 detail-box">
+              <small class="text-uppercase tracking-wider fw-bold text-muted d-block mb-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">Country</small>
+              <span class="fs-5 fw-bold text-dark text-truncate d-block"><i class="bi bi-globe2 text-primary me-1"></i><%= listing.country %></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <% if(currUser) { %>
+        <div class="card premium-show-card border-0 p-4 rounded-4 bg-white mb-4">
+          <h4 class="fw-bold mb-3 text-dark"><i class="bi bi-chat-square-heart me-2 text-gold"></i>Leave a Review</h4>
+          <form action="/listings/<%= listing.id %>/reviews" method="POST" novalidate class="needs-validation">
+            
+            <div class="mb-3 mt-2">
+              <label class="form-label fw-bold text-secondary small mb-1" style="letter-spacing: 0.3px;">YOUR RATING SCORE</label>
+              <fieldset class="starability-basic">
+                <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
+                <input type="radio" id="first-rate5" name="review[rating]" value="5" />
+                <label for="first-rate5" title="Amazing"></label>
+                <input type="radio" id="first-rate4" name="review[rating]" value="4" />
+                <label for="first-rate4" title="Very good"></label>
+                <input type="radio" id="first-rate3" name="review[rating]" value="3" />
+                <label for="first-rate3" title="Average"></label>
+                <input type="radio" id="first-rate2" name="review[rating]" value="2" />
+                <label for="first-rate2" title="Not good"></label>
+                <input type="radio" id="first-rate1" name="review[rating]" value="1" />
+                <label for="first-rate1" title="Terrible"></label>
+              </fieldset>
+            </div>
+
+            <div class="mb-3">
+              <label for="comment" class="form-label fw-bold text-secondary small">YOUR EXPERIENCE</label>
+              <textarea name="review[comment]" id="comment" cols="30" rows="3" class="form-control rounded-3" placeholder="Share details of your stay..." required></textarea>
+              <div class="invalid-feedback">Please add some comments for your review experience!</div>
+            </div>
+            <div class="mb-3">
+              <button class="btn btn-outline-dark px-4 py-2 rounded-3 fw-medium">Submit Review</button>
+            </div>
+          </form>
+        </div>
+      <% } %>
+
+      <div class="card premium-show-card border-0 p-4 rounded-4 bg-white mb-4">
+        <h5 class="fw-bold text-dark mb-3"><i class="bi bi-stars text-warning me-2"></i>Community Feedback</h5>
+        <div class="row g-3">
+          <% if (listing.reviews.length === 0) { %>
+            <div class="col-12">
+              <p class="text-muted fst-italic mb-0">No reviews shared yet for this listing destination.</p>
+            </div>
+          <% } %>
+          <% for(review of listing.reviews) { %>
+            <div class="col-md-6 col-12">
+              <div class="border rounded-4 p-3 bg-light-subtle h-100" style="border-color: #e9ecef !important;">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <h6 class="fw-bold text-dark m-0 small">@<%= (review.author && review.author.username) ? review.author.username : "historical_user" %></h6>
+                  <div class="static-stars">
+                    <% for(let i=0; i < review.rating; i++) { %>★<% } %><% for(let i=review.rating; i < 5; i++) { %>☆<% } %>
+                  </div>
+                </div>
+                <p class="card-text text-secondary mb-2 small" style="line-height: 1.5;"><%= review.comment %></p>
+                
+                <% if(currUser && review.author && currUser._id.toString() === review.author._id.toString()) { %>
+                  <form method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
+                    <button class="btn btn-sm btn-link text-danger p-0 text-decoration-none fw-semibold small">
+                      <i class="bi bi-trash3 me-1"></i>Delete
+                    </button>
+                  </form>
+                <% } %>
+              </div>
+            </div>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="card premium-show-card border-0 p-4 rounded-4 bg-white mb-2">
+        <h4 class="fw-bold text-dark mb-3"><i class="bi bi-map-fill text-success me-2"></i>Where you'll be</h4>
+        <div id="map" class="border" style="height: 320px; width: 100%; border-radius: 12px; z-index: 1; display: block;"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+    const rawCoords = <%= (listing.geometry && listing.geometry.coordinates && listing.geometry.coordinates.length === 2) ? JSON.stringify(listing.geometry.coordinates) : JSON.stringify([77.2090, 28.6139]) %>;
+    
+    const lat = rawCoords[1];
+    const lon = rawCoords[0];
+    
+    // Initialize Leaflet Map
+    const map = L.map('map').setView([lat, lon], 10);
+
+    // Mount Free OpenStreetMap tile layers gracefully
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Drop marker pin onto coordinates position
+    L.marker([lat, lon]).addTo(map)
+        .bindPopup(`<b><%= listing.location %></b><br>Exact location provided after booking.`)
+        .openPopup();
+</script>

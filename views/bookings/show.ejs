@@ -1,0 +1,74 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container mt-4 mb-5" style="max-width: 620px;">
+  <% const statusColors = { pending: "warning", confirmed: "success", cancelled: "secondary" }; %>
+
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <h2 class="fw-bold mb-0">Booking Details</h2>
+    <span class="badge bg-<%= statusColors[booking.status] %> text-uppercase px-3 py-2 rounded-pill">
+      <%= booking.status %>
+    </span>
+  </div>
+
+  <% if (booking.status === "confirmed") { %>
+    <div class="alert alert-success rounded-4 p-4 mb-4">
+      <h5 class="fw-bold mb-2">🎉 Congratulations!</h5>
+      <p class="mb-1">Dear beloved <strong><%= booking.guestName || booking.user.username %></strong>, your stay at
+        <strong><%= booking.listing.title %></strong> is confirmed!</p>
+      <p class="mb-0 small">
+        Check in on <strong><%= booking.checkIn.toDateString() %></strong> and check out by
+        <strong><%= booking.checkOut.toDateString() %></strong>. We can't wait to host you — have a wonderful trip!
+      </p>
+      <a href="/bookings/<%= booking._id %>/receipt" target="_blank" class="btn btn-dark btn-sm rounded-3 mt-3">
+        <i class="bi bi-download me-1"></i>Download Receipt
+      </a>
+    </div>
+  <% } %>
+
+  <div class="card border-0 rounded-4 shadow-sm p-4 mb-4">
+    <div class="d-flex gap-3 mb-3">
+      <img src="<%= booking.listing.image.url %>" class="rounded-3 object-fit-cover" style="width: 110px; height: 90px;" alt="listing">
+      <div>
+        <h5 class="fw-bold mb-1"><%= booking.listing.title %></h5>
+        <p class="text-secondary small mb-0"><i class="bi bi-geo-alt-fill text-gold me-1"></i><%= booking.listing.location %>, <%= booking.listing.country %></p>
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="d-flex justify-content-between mb-2">
+      <span class="text-secondary">Check-in</span>
+      <span class="fw-medium"><%= booking.checkIn.toDateString() %></span>
+    </div>
+    <div class="d-flex justify-content-between mb-2">
+      <span class="text-secondary">Check-out</span>
+      <span class="fw-medium"><%= booking.checkOut.toDateString() %></span>
+    </div>
+    <div class="d-flex justify-content-between mb-2">
+      <span class="text-secondary">Guests</span>
+      <span class="fw-medium"><%= booking.guests %></span>
+    </div>
+
+    <% if (booking.festivalApplied) { %>
+      <div class="text-secondary small mt-2">
+        <i class="bi bi-stars me-1"></i>Seasonal pricing applied due to <strong><%= booking.festivalApplied %></strong>
+      </div>
+    <% } %>
+
+    <hr>
+
+    <div class="d-flex justify-content-between fw-bold fs-5 text-dark">
+      <span>Total Paid</span>
+      <span>&#8377;<%= booking.totalPrice.toLocaleString("en-IN") %></span>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2">
+    <a href="/bookings" class="btn btn-outline-dark rounded-3 px-4">Back to My Trips</a>
+    <% if (booking.status !== "cancelled") { %>
+      <form method="POST" action="/bookings/<%= booking._id %>/cancel" onsubmit="return confirm('Cancel this booking?');">
+        <button class="btn btn-outline-danger rounded-3 px-4">Cancel Booking</button>
+      </form>
+    <% } %>
+  </div>
+</div>

@@ -1,0 +1,56 @@
+<nav class="navbar navbar-expand-md bg-body-light border-bottom sticky-top">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold text-royal d-flex align-items-center gap-2" href="/listings">
+      <i class="fa-regular font-compass fa-compass fs-3 text-gold"></i>
+      <span class="fs-4" style="letter-spacing: -0.5px;">FairStay</span>
+    </a>
+
+    <!-- Rest of your navbar items remain unchanged -->
+
+    <div class="navbar-nav ms-auto me-auto d-none d-md-flex">
+      <form id="smart-search-form" class="d-flex align-items-center border rounded-pill p-1 bg-white shadow-sm"
+        action="/listings" method="GET" style="min-width: 380px; height: 44px;">
+        <input id="smart-search-input" class="form-control border-0 ps-3 bg-transparent text-dark" type="search"
+          name="category" placeholder="Search destinations, or try 'cheap stay in Goa for Holi'" aria-label="Search"
+          style="box-shadow: none; font-size: 0.85rem; font-weight: 500;">
+        <button type="button" id="ai-search-btn" title="Search with AI (understands natural language)"
+          class="btn rounded-pill d-flex align-items-center px-2 me-1"
+          style="background-color: #fdf6e3; color: var(--royal-blue, #1B3B6D); height: 36px; font-size: 0.8rem; font-weight: 600; border: 1px solid #E9D8A6;">
+          <i class="bi bi-stars" style="color: #C9A227;"></i>
+        </button>
+        <button class="btn rounded-pill text-white d-flex align-items-center px-3" type="submit"
+          style="background-color: #1B3B6D; height: 36px; font-size: 0.85rem; font-weight: 600; gap: 4px; transition: background 0.2s;"
+          onmouseover="this.style.backgroundColor='#10254A'" onmouseout="this.style.backgroundColor='#1B3B6D'">
+          <i class="bi bi-search fs-6"></i> Search
+        </button>
+      </form>
+    </div>
+    <script src="/js/smartSearch.js"></script>
+
+    <button class="navbar-toggler rounded-pill border-0 shadow-none p-2" type="button" data-bs-toggle="collapse"
+      data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false"
+      aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon" style="transform: scale(0.85);"></span>
+    </button>
+
+    <div class="collapse navbar-collapse bg-body-tertiary" id="navbarNavAltMarkup">
+      <div class="navbar-nav ms-auto align-items-md-center gap-2 pt-2 pt-md-0">
+        <a class="nav-link fw-medium small px-3 text-dark" href="/listings">Home</a>
+        <a class="nav-link fw-medium small px-3 text-dark" href="/listings/new">Become a Host</a>
+
+        <% if(!currUser) { %>
+          <a class="nav-link fw-bold small px-3 text-dark" href="/signup">Sign up</a>
+          <a class="nav-link fw-medium small px-3 text-dark" href="/login">Log in</a>
+          <% } else { %>
+            <a class="nav-link fw-medium small px-3 text-dark" href="/bookings"><i
+                class="bi bi-suitcase-lg-fill me-1"></i>My Trips</a>
+            <a class="nav-link fw-medium small px-3 text-dark" href="/bookings/host/panel"><i
+                class="bi bi-house-check-fill me-1"></i>Host Bookings</a>
+            <a class="nav-link fw-medium small px-3 text-dark" href="/profile"><i
+                class="bi bi-person-circle me-1"></i>Profile</a>
+            <a class="nav-link fw-medium small px-3 text-danger fw-bold" href="/logout">Log out</a>
+            <% } %>
+      </div>
+    </div>
+  </div>
+</nav>

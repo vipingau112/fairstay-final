@@ -1,0 +1,56 @@
+<% layout("/layouts/boilerplate") %>
+<div class="row mt-3">
+    <h1 class="col-6 offset-3 mb-3 fw-bold">Your Profile</h1>
+    <div class="col-6 offset-3">
+
+        <div class="d-flex align-items-center gap-3 mb-4">
+            <img src="<%= currUser.profilePhoto && currUser.profilePhoto.url ? currUser.profilePhoto.url : 'https://res.cloudinary.com/demo/image/upload/w_120,h_120,c_fill,g_face,r_max/sample.jpg' %>"
+                alt="Profile photo" class="rounded-circle object-fit-cover" style="width: 90px; height: 90px; border: 2px solid #E9D8A6;">
+            <div>
+                <div class="fw-bold fs-5"><%= currUser.username %></div>
+                <div class="text-secondary small">
+                    <%= currUser.email %>
+                    <% if (currUser.emailVerified) { %>
+                        <span class="badge bg-success ms-1">Verified</span>
+                    <% } else { %>
+                        <span class="badge bg-warning text-dark ms-1">Not verified</span>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <% if (!currUser.emailVerified) { %>
+            <div class="alert alert-warning small">
+                Your email isn't verified yet. <a href="/verify-otp">Verify it now</a>.
+            </div>
+        <% } %>
+
+        <form action="/profile" method="POST" enctype="multipart/form-data" novalidate>
+            <div class="mb-3">
+                <label for="username" class="form-label">Name / Username</label>
+                <input id="username" type="text" class="form-control" value="<%= currUser.username %>" disabled />
+                <div class="form-text">This was set and verified when you signed up.</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input id="email" type="email" class="form-control" value="<%= currUser.email %>" disabled />
+                <div class="form-text">Verified at signup — contact support to change your email.</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="phone" class="form-label">Phone number</label>
+                <input name="phone" id="phone" type="tel" class="form-control" value="<%= currUser.phone || '' %>"
+                    placeholder="e.g. +91 98765 43210" />
+            </div>
+
+            <div class="mb-3">
+                <label for="photo" class="form-label">Profile photo</label>
+                <input name="photo" id="photo" type="file" accept="image/*" class="form-control" />
+                <div class="form-text">Used across Fairstay whether you're booking a stay or hosting a listing.</div>
+            </div>
+
+            <button class="btn btn-royal px-4 py-2">Save Profile</button>
+        </form>
+    </div>
+</div>

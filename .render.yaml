@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: fairstay
+    env: node
+    branch: main
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    autoDeploy: true

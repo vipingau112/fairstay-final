@@ -1,0 +1,71 @@
+:root {
+  --royal-blue: #1B3B6D;
+  --royal-blue-dark: #10254A;
+  --royal-blue-light: #2E5090;
+  --royal-gold: #C9A227;
+  --royal-gold-light: #E9D8A6;
+}
+
+body {
+  font-family: "Plus Jakarta Sans", sans-serif !important;
+  background-color: #ffffff;
+}
+
+.sticky-top {
+  position: sticky !important;
+  top: 0;
+  z-index: 1030;
+  background-color: #ffffff !important;
+}
+
+/* Royal Gold/Blue brand theme button */
+.add-btn {
+  background-color: var(--royal-blue) !important;
+  border: 1px solid var(--royal-gold) !important;
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+  color: #fff !important;
+}
+
+.add-btn:hover {
+  background-color: var(--royal-blue-dark) !important;
+}
+
+.brand-text {
+  color: var(--royal-blue) !important;
+}
+
+.text-royal {
+  color: var(--royal-blue) !important;
+}
+
+.text-gold {
+  color: var(--royal-gold) !important;
+}
+
+.bg-royal {
+  background-color: var(--royal-blue) !important;
+}
+
+.btn-royal {
+  background-color: var(--royal-blue) !important;
+  border: 1px solid var(--royal-gold) !important;
+  color: #fff !important;
+}
+
+.btn-royal:hover {
+  background-color: var(--royal-blue-dark) !important;
+  color: #fff !important;
+}
+
+.btn-outline-royal {
+  background-color: transparent !important;
+  border: 1px solid var(--royal-blue) !important;
+  color: var(--royal-blue) !important;
+}
+
+.btn-outline-royal:hover {
+  background-color: var(--royal-blue) !important;
+  color: #fff !important;
+}
+
