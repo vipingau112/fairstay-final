@@ -3,12 +3,12 @@ const { askGemini, askGeminiJSON } = require("../utils/geminiClient");
 const { computeSeasonalPrice } = require("../utils/festivals");
 
 const CHAT_SYSTEM_PROMPT = `You are the friendly in-app travel assistant for "Fairstay", a stays-booking site focused
-on major Indian pilgrimage destinations: Prayagraj (Sangam, Magh Mela), Haridwar, Rishikesh (Char Dham gateway), and
-Nashik (Kumbh Mela). Help users with travel advice, trip planning, best times to visit, packing tips, festival/pilgrimage
-travel advice, and questions about staying at Fairstay listings. Keep answers concise (under 120 words), warm, and practical.
-If asked about destinations outside these four cities, politely note that Fairstay currently covers Prayagraj, Haridwar,
-Rishikesh, and Nashik. If asked something totally unrelated to travel/stays, gently redirect to travel topics.`;
-
+on major Indian pilgrimage destinations: Prayagraj (Sangam, Magh Mela), Haridwar, Rishikesh (Char Dham gateway),
+Nashik (Kumbh Mela), and Varanasi (Kashi, Ganga Aarti, Dev Deepawali). Help users with travel advice, trip planning,
+best times to visit, packing tips, festival/pilgrimage travel advice, and questions about staying at Fairstay listings.
+Keep answers concise (under 120 words), warm, and practical.
+If asked about destinations outside these five cities, politely note that Fairstay currently covers Prayagraj, Haridwar,
+Rishikesh, Nashik, and Varanasi. If asked something totally unrelated to travel/stays, gently redirect to travel topics.`;
 // Answered directly, without an AI call, so it's always accurate & instant
 const CREATOR_QUESTION_PATTERN = /who\s+(made|built|created|developed|designed)\s+(this|fairstay|the\s+website|the\s+site|the\s+app)/i;
 
@@ -53,14 +53,13 @@ module.exports.smartSearch = async (req, res) => {
             return res.status(400).json({ error: "Search query is required." });
         }
 
-        const systemInstruction = `You convert a free-text travel search query into structured JSON filters
-for a listings database. Listings are in one of four Indian pilgrimage cities: Prayagraj, Haridwar, Rishikesh, or Nashik.
+               const systemInstruction = `You convert a free-text travel search query into structured JSON filters
+for a listings database. Listings are in one of five Indian pilgrimage cities: Prayagraj, Haridwar, Rishikesh, Nashik, or Varanasi.
 Fields available: keywords (short string of 1-3 words capturing property type/vibe/amenity, or null),
-city (one of "Prayagraj", "Haridwar", "Rishikesh", "Nashik" if the query mentions or clearly implies one, or null),
+city (one of "Prayagraj", "Haridwar", "Rishikesh", "Nashik", "Varanasi" if the query mentions or clearly implies one, or null),
 maxPrice (number in INR per night, or null), minPrice (number in INR per night, or null).
 Only include a field if the query implies it. Respond with ONLY JSON like:
 {"keywords": "budget hotel", "city": "Haridwar", "minPrice": null, "maxPrice": 2000}`;
-
         const filters = await askGeminiJSON(`Query: "${query}"`, systemInstruction);
 
         if (!filters) {

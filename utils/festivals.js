@@ -67,6 +67,18 @@ const SPECIAL_EVENTS = [
         localMultiplier: 1.6,
         locationKeywords: ["uttarakhand", "badrinath", "kedarnath", "gangotri", "yamunotri", "rishikesh", "haridwar"],
     },
+        {
+        // Varanasi's biggest pilgrimage event — Dev Deepawali, when
+        // millions of lamps light the ghats on Kartik Purnima. Same
+        // local-multiplier pattern as Magh Mela, targeting an 80–90% hike
+        // for stays right in Varanasi during the festival itself.
+        name: "Dev Deepawali (Varanasi Ghats)",
+        startDate: new Date("2026-11-20"),
+        endDate: new Date("2026-11-26"),
+        multiplier: 1.15,
+        localMultiplier: 1.85,
+        locationKeywords: ["varanasi", "banaras", "kashi", "ghats"],
+    },
 ];
 
 function daysBetween(a, b) {

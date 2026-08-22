@@ -1,5 +1,3 @@
-
-
 # Fairstay 🏨
 
 **Fairstay** is a full-stack stays-booking platform focused on **Prayagraj, India** — built as a final year project. It combines a classic Airbnb-style listings experience with AI-powered travel features, live festival-aware pricing, and real payment processing.
@@ -7,6 +5,7 @@
 ## ✨ Features
 
 ### Core Platform
+
 - User authentication (signup/login/logout) with Passport.js
 - Email verification (secure token-based, one account per email)
 - Create, edit, and delete property listings with image uploads (Cloudinary)
@@ -14,20 +13,24 @@
 - Fully responsive, custom-designed UI (Royal Gold/Blue theme)
 
 ### AI-Powered Features
+
 - **AI Travel Chatbot** — a Gemini-powered assistant for Prayagraj travel advice, packing tips, and festival guidance
-- **AI Smart Search** — converts natural language queries (e.g. *"cheap stay under ₹2000"*) into structured search filters
+- **AI Smart Search** — converts natural language queries (e.g. _"cheap stay under ₹2000"_) into structured search filters
 - **Live Seasonal Pricing** — automatically applies fair price adjustments during major Indian festivals, pulled live from a public holiday calendar API (no manual yearly updates needed) plus tracked pilgrimage events (Kumbh Mela, Char Dham Yatra)
 
 ### Bookings & Payments
+
 - Full booking flow with date selection, guest count, and live price breakdown
 - Availability checking (prevents double-booking the same dates)
 - Real payment processing via **Stripe Checkout**, with a safe test-mode fallback when Stripe isn't configured
 - "My Trips" dashboard to view and cancel bookings
 
 ### Live Data Integration
-- **Google Places API** import — pulls real hotels in Prayagraj, Haridwar, Rishikesh, and Nashik (names, ratings, photos, addresses) directly into the platform. Visit `/admin/import-hotels/<city>` while logged in (e.g. `/admin/import-hotels/haridwar`)
+
+- - **Google Places API** import — pulls real hotels in Prayagraj, Haridwar, Rishikesh, Nashik, and Varanasi (names, ratings, photos, addresses) directly into the platform. Visit `/admin/import-hotels/<city>` while logged in (e.g. `/admin/import-hotels/varanasi`)
 
 ## 🛠️ Tech Stack
+
 - **Backend**: Node.js, Express.js
 - **Database**: MongoDB (Mongoose) — hosted on MongoDB Atlas
 - **Templating**: EJS + ejs-mate
@@ -40,6 +43,7 @@
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Node.js v18+
 - A MongoDB Atlas account (free tier works)
 - API keys for: Cloudinary, Google Gemini, Stripe (optional), Google Places (optional), Gmail App Password (optional)
@@ -153,4 +157,5 @@ npm start
 Made with ❤️ by **Vipin Gautam** and team
 
 ---
-*This project was built as a final year submission.*
+
+_This project was built as a final year submission._

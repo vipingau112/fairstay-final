@@ -20,7 +20,7 @@ router.get("/", async (req, res, next) => {
     try {
         const { category, location, country, minPrice, maxPrice } = req.query;
         let andConditions = [
-            { location: new RegExp("prayagraj|allahabad|haridwar|nashik|rishikesh", "i") },
+{ location: new RegExp("prayagraj|allahabad|haridwar|nashik|rishikesh|varanasi|banaras|kashi", "i") },
         ];
 
         // Smart dynamic matcher checking title, location, country, and description

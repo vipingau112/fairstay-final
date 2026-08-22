@@ -36,6 +36,13 @@ const CITY_CONFIGS = {
         matchKeywords: ["rishikesh"],
         defaultCoords: { lat: 30.0869, lng: 78.2676 },
     },
+    varanasi: {
+        label: "Varanasi",
+        searchQuery: "hotels in Varanasi",
+        fallbackLocation: "Varanasi, Uttar Pradesh",
+        matchKeywords: ["varanasi", "banaras", "kashi"],
+        defaultCoords: { lat: 25.3176, lng: 82.9739 },
+    },
 };
 
 function photoUrlFor(photoReference, apiKey) {
