@@ -77,6 +77,7 @@ async function importCityHotels(ownerId, cityKey) {
 
     let results = [];
     let pagesLeft = 3; // Google returns ~20 per page, up to 60 total across 3 pages
+    let isFirstPage = true;
 
     while (pagesLeft > 0) {
         const res = await fetch(url);
@@ -84,15 +85,27 @@ async function importCityHotels(ownerId, cityKey) {
 
         if (data.status !== "OK" && data.status !== "ZERO_RESULTS") {
             console.error(`[placesImport] Google Places request failed. status=${data.status} error_message=${data.error_message} url=${url.replace(apiKey, "REDACTED")}`);
+
+            // A next_page_token can take a moment to become valid on
+            // Google's side — if OUR FIRST page already succeeded and it's
+            // only a later page failing (a timing quirk, not a real
+            // config/auth problem), just stop paginating and use what we
+            // already have instead of failing the whole import.
+            if (!isFirstPage) {
+                console.warn("[placesImport] Stopping pagination early due to the error above — keeping results already fetched.");
+                break;
+            }
             throw new Error(`Google Places error: ${data.status} ${data.error_message || ""}`);
         }
 
+        console.log(`[placesImport] Page ${isFirstPage ? 1 : "2+"} succeeded with ${(data.results || []).length} result(s).`);
         results = results.concat(data.results || []);
         pagesLeft--;
+        isFirstPage = false;
 
         if (data.next_page_token && pagesLeft > 0) {
             // Google requires a short delay before a page token becomes valid
-            await new Promise((resolve) => setTimeout(resolve, 2000));
+            await new Promise((resolve) => setTimeout(resolve, 3000));
             url = `${PLACES_TEXT_SEARCH_URL}?pagetoken=${data.next_page_token}&key=${apiKey}`;
         } else {
             break;
