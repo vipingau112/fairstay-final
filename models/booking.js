@@ -28,6 +28,8 @@ const bookingSchema = new Schema(
             enum: ["pending", "confirmed", "cancelled"],
             default: "pending",
         },
+        // Assigned automatically once a booking is confirmed (e.g. "204")
+        roomNumber: { type: String, default: null },
     },
     { timestamps: true }
 );

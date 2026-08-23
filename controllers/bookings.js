@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Listing = require("../models/listing");
 const Booking = require("../models/booking");
 const { hasOverlap } = require("../utils/availability");
@@ -8,6 +9,14 @@ const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
 function nightsBetween(checkIn, checkOut) {
     return Math.round((checkOut.getTime() - checkIn.getTime()) / MS_PER_DAY);
+}
+
+// Generates a plausible-looking room number, e.g. "204", "1108" — floor
+// digit(s) (1-9) followed by a two-digit room number (01-40) on that floor.
+function generateRoomNumber() {
+    const floor = 1 + Math.floor(Math.random() * 9); // 1-9
+    const room = 1 + Math.floor(Math.random() * 40); // 1-40
+    return `${floor}${String(room).padStart(2, "0")}`;
 }
 
 // POST /listings/:id/bookings
@@ -46,7 +55,8 @@ module.exports.createBooking = async (req, res) => {
         return res.redirect(`/listings/${id}`);
     }
 
-    // Availability check — no overlapping confirmed/pending bookings
+    // Fast pre-check — rejects obviously-conflicting requests early, before
+    // we spend time computing seasonal pricing.
     const conflict = await hasOverlap(id, checkInDate, checkOutDate);
     if (conflict) {
         req.flash("error", "Those dates are already booked. Please choose different dates.");
@@ -64,23 +74,52 @@ module.exports.createBooking = async (req, res) => {
     });
     const totalPrice = nights * seasonal.suggestedPrice;
 
-    const booking = new Booking({
-        listing: listing._id,
-        user: req.user._id,
-        checkIn: checkInDate,
-        checkOut: checkOutDate,
-        guests: Number(guests) || 1,
-        guestName: (guestName || req.user.username || "").trim(),
-        guestEmail: (guestEmail || req.user.email || "").trim(),
-        nights,
-        pricePerNight: listing.price,
-        seasonalMultiplier: seasonal.multiplier,
-        festivalApplied: seasonal.festival,
-        totalPrice,
-        status: "pending",
-    });
+    // Final availability check + insert happen together, inside a single
+    // transaction — this closes the gap where two people booking the same
+    // dates at nearly the same instant could both pass the check above
+    // before either booking was actually saved.
+    const session = await mongoose.startSession();
+    let booking;
+    try {
+        await session.withTransaction(async () => {
+            const stillConflicts = await Booking.findOne({
+                listing: id,
+                status: { $ne: "cancelled" },
+                checkIn: { $lt: checkOutDate },
+                checkOut: { $gt: checkInDate },
+            }).session(session);
 
-    await booking.save();
+            if (stillConflicts) {
+                throw new Error("DATES_JUST_BOOKED");
+            }
+
+            booking = new Booking({
+                listing: listing._id,
+                user: req.user._id,
+                checkIn: checkInDate,
+                checkOut: checkOutDate,
+                guests: Number(guests) || 1,
+                guestName: (guestName || req.user.username || "").trim(),
+                guestEmail: (guestEmail || req.user.email || "").trim(),
+                nights,
+                pricePerNight: listing.price,
+                seasonalMultiplier: seasonal.multiplier,
+                festivalApplied: seasonal.festival,
+                totalPrice,
+                status: "pending",
+            });
+            await booking.save({ session });
+        });
+    } catch (err) {
+        if (err.message === "DATES_JUST_BOOKED") {
+            req.flash("error", "Someone just booked those dates. Please choose different dates.");
+            return res.redirect(`/listings/${id}`);
+        }
+        throw err;
+    } finally {
+        await session.endSession();
+    }
+
     res.redirect(`/bookings/${booking._id}/checkout`);
 };
 
@@ -199,6 +238,7 @@ module.exports.paymentSuccess = async (req, res) => {
         }
 
         booking.status = "confirmed";
+        booking.roomNumber = generateRoomNumber();
         await booking.save();
         req.flash("success", "🎉 Payment successful! Booking confirmed.");
         res.redirect(`/bookings/${booking._id}`);
@@ -233,6 +273,7 @@ module.exports.confirmMock = async (req, res) => {
     }
 
     booking.status = "confirmed";
+    booking.roomNumber = generateRoomNumber();
     await booking.save();
     req.flash("success", "🎉 Booking confirmed! (Test mode — no Stripe key configured, so payment was simulated.)");
     res.redirect(`/bookings/${booking._id}`);

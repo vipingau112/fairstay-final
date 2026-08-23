@@ -1,48 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <title>Receipt — <%= booking.listing.title %></title>
+  <title>Receipt — <%= booking.listing.title %>
+  </title>
   <style>
-    body { font-family: 'Segoe UI', Arial, sans-serif; color: #222; max-width: 620px; margin: 40px auto; padding: 0 20px; }
-    .brand { color: #1B3B6D; font-weight: 700; font-size: 1.6rem; margin-bottom: 4px; }
-    .muted { color: #888; font-size: 0.85rem; }
-    hr { border: none; border-top: 1px solid #eee; margin: 20px 0; }
-    .row { display: flex; justify-content: space-between; margin-bottom: 8px; }
-    .total { font-weight: 700; font-size: 1.2rem; color: #1B3B6D; }
-    .print-btn { background: #1B3B6D; color: #fff; border: none; padding: 10px 22px; border-radius: 6px; cursor: pointer; font-weight: 600; margin-top: 24px; }
-    @media print { .no-print { display: none; } }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: #222;
+      max-width: 620px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .brand {
+      color: #1B3B6D;
+      font-weight: 700;
+      font-size: 1.6rem;
+      margin-bottom: 4px;
+    }
+
+    .muted {
+      color: #888;
+      font-size: 0.85rem;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #eee;
+      margin: 20px 0;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .total {
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: #1B3B6D;
+    }
+
+    .print-btn {
+      background: #1B3B6D;
+      color: #fff;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-top: 24px;
+    }
+
+    @media print {
+      .no-print {
+        display: none;
+      }
+    }
   </style>
 </head>
+
 <body>
   <div class="brand">Fairstay</div>
-  <div class="muted">Booking Receipt — #<%= booking._id %></div>
+  <div class="muted">Booking Receipt — #<%= booking._id %>
+  </div>
   <hr>
 
-  <div class="row"><span class="muted">Guest</span><span><%= booking.guestName || booking.user.username %></span></div>
-  <div class="row"><span class="muted">Email</span><span><%= booking.guestEmail || booking.user.email %></span></div>
-  <div class="row"><span class="muted">Property</span><span><%= booking.listing.title %></span></div>
-  <div class="row"><span class="muted">Location</span><span><%= booking.listing.location %>, <%= booking.listing.country %></span></div>
+  <div class="row"><span class="muted">Guest</span><span>
+      <%= booking.guestName || booking.user.username %>
+    </span></div>
+  <div class="row"><span class="muted">Email</span><span>
+      <%= booking.guestEmail || booking.user.email %>
+    </span></div>
+  <div class="row"><span class="muted">Property</span><span>
+      <%= booking.listing.title %>
+    </span></div>
+  <div class="row"><span class="muted">Location</span><span>
+      <%= booking.listing.location %>, <%= booking.listing.country %>
+    </span></div>
 
   <hr>
 
-  <div class="row"><span class="muted">Check-in</span><span><%= booking.checkIn.toDateString() %></span></div>
-  <div class="row"><span class="muted">Check-out</span><span><%= booking.checkOut.toDateString() %></span></div>
-  <div class="row"><span class="muted">Guests</span><span><%= booking.guests %></span></div>
-  <div class="row"><span class="muted">Nights</span><span><%= booking.nights %></span></div>
+  <div class="row"><span class="muted">Check-in</span><span>
+      <%= booking.checkIn.toDateString() %>
+    </span></div>
+  <div class="row"><span class="muted">Check-out</span><span>
+      <%= booking.checkOut.toDateString() %>
+    </span></div>
+  <div class="row"><span class="muted">Guests</span><span>
+      <%= booking.guests %>
+    </span></div>
+  <div class="row"><span class="muted">Nights</span><span>
+      <%= booking.nights %>
+    </span></div>
+  <% if (booking.roomNumber) { %>
+    <div class="row"><span class="muted">Room</span><span>
+        <%= booking.roomNumber %>
+      </span></div>
+    <% } %>
 
-  <% if (booking.festivalApplied) { %>
-    <div class="row"><span class="muted">Seasonal adjustment</span><span><%= booking.festivalApplied %> (&times;<%= booking.seasonalMultiplier %>)</span></div>
-  <% } %>
+      <% if (booking.festivalApplied) { %>
+        <div class="row"><span class="muted">Seasonal adjustment</span><span>
+            <%= booking.festivalApplied %> (&times;<%= booking.seasonalMultiplier %>)
+          </span></div>
+        <% } %>
 
-  <hr>
+          <hr>
 
-  <div class="row total"><span>Total Paid</span><span>&#8377;<%= booking.totalPrice.toLocaleString("en-IN") %></span></div>
-  <div class="muted" style="margin-top:4px;">Status: <%= booking.status.toUpperCase() %></div>
+          <div class="row total"><span>Total Paid</span><span>&#8377;<%= booking.totalPrice.toLocaleString("en-IN") %>
+                </span></div>
+          <div class="muted" style="margin-top:4px;">Status: <%= booking.status.toUpperCase() %>
+          </div>
 
-  <hr>
-  <p class="muted">Thank you for booking with Fairstay. Have a wonderful stay!</p>
+          <hr>
+          <p class="muted">Thank you for booking with Fairstay. Have a wonderful stay!</p>
 
-  <button class="print-btn no-print" onclick="window.print()">Print / Save as PDF</button>
+          <button class="print-btn no-print" onclick="window.print()">Print / Save as PDF</button>
 </body>
+
 </html>
