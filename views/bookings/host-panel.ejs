@@ -1,0 +1,124 @@
+<% layout("/layouts/boilerplate") %>
+
+    <div class="container mt-4 mb-5">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+            <h2 class="fw-bold mb-0">Bookings on Your Listings</h2>
+            <span class="text-secondary small"><i class="bi bi-house-check-fill me-1"></i>Host dashboard</span>
+        </div>
+
+        <!-- Quick stats -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3">
+                <div class="card border-0 shadow-sm rounded-4 p-3 h-100">
+                    <div class="text-secondary small text-uppercase" style="letter-spacing: 0.5px; font-size: 0.7rem;">
+                        Total Bookings</div>
+                    <div class="fs-3 fw-bold">
+                        <%= stats.total %>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card border-0 shadow-sm rounded-4 p-3 h-100">
+                    <div class="text-secondary small text-uppercase" style="letter-spacing: 0.5px; font-size: 0.7rem;">
+                        Confirmed</div>
+                    <div class="fs-3 fw-bold text-success">
+                        <%= stats.confirmed %>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card border-0 shadow-sm rounded-4 p-3 h-100">
+                    <div class="text-secondary small text-uppercase" style="letter-spacing: 0.5px; font-size: 0.7rem;">
+                        Pending</div>
+                    <div class="fs-3 fw-bold text-warning">
+                        <%= stats.pending %>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card border-0 rounded-4 p-3 h-100" style="background: #1B3B6D; color: #fff;">
+                    <div class="small text-uppercase" style="letter-spacing: 0.5px; font-size: 0.7rem; opacity: 0.8;">
+                        Revenue (Confirmed)</div>
+                    <div class="fs-4 fw-bold">&#8377;<%= stats.revenue.toLocaleString("en-IN") %>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <% const statusColors={ pending: "warning" , confirmed: "success" , cancelled: "secondary" }; %>
+
+            <% if (bookings.length===0) { %>
+                <div class="card border-0 shadow-sm rounded-4 p-5 text-center text-muted">
+                    No bookings on your listings yet.
+                </div>
+                <% } else { %>
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead style="background: #fdf6e3;">
+                                    <tr class="text-secondary small text-uppercase" style="letter-spacing: 0.5px;">
+                                        <th class="ps-4">Guest</th>
+                                        <th>Property</th>
+                                        <th>Dates</th>
+                                        <th>Room</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th class="pe-4"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% for (let booking of bookings) { %>
+                                        <tr>
+                                            <td class="ps-4">
+                                                <div class="fw-medium">
+                                                    <%= booking.guestName || (booking.user && booking.user.username) %>
+                                                </div>
+                                                <div class="text-secondary small">
+                                                    <%= booking.guestEmail || (booking.user && booking.user.email) %>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <img src="<%= booking.listing.image.url %>"
+                                                        class="rounded-3 object-fit-cover"
+                                                        style="width: 44px; height: 40px;" alt="listing">
+                                                    <span class="fw-medium small">
+                                                        <%= booking.listing.title %>
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td class="small text-secondary">
+                                                <%= booking.checkIn.toDateString() %><br>&rarr; <%=
+                                                        booking.checkOut.toDateString() %>
+                                            </td>
+                                            <td class="small">
+                                                <% if (booking.roomNumber) { %>
+                                                    <span class="badge bg-dark rounded-pill"><i
+                                                            class="bi bi-door-closed-fill me-1"></i>
+                                                        <%= booking.roomNumber %>
+                                                    </span>
+                                                    <% } else { %>
+                                                        <span class="text-muted">&mdash;</span>
+                                                        <% } %>
+                                            </td>
+                                            <td class="fw-medium">&#8377;<%= booking.totalPrice.toLocaleString("en-IN")
+                                                    %>
+                                            </td>
+                                            <td>
+                                                <span
+                                                    class="badge bg-<%= statusColors[booking.status] %> text-uppercase small">
+                                                    <%= booking.status %>
+                                                </span>
+                                            </td>
+                                            <td class="pe-4 text-end">
+                                                <a href="/bookings/<%= booking._id %>"
+                                                    class="btn btn-sm btn-outline-dark rounded-3">View</a>
+                                            </td>
+                                        </tr>
+                                        <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <% } %>
+    </div>

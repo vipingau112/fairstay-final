@@ -330,7 +330,7 @@ module.exports.myBookings = async (req, res) => {
         .populate("listing")
         .sort({ checkIn: 1 });
 
-    res.render("bookings/index.ejs", { bookings, panelTitle: "My Trips", isHostPanel: false });
+    res.render("bookings/index.ejs", { bookings });
 };
 
 // GET /bookings/host/panel  (Host panel — bookings made on listings the current user owns)
@@ -342,7 +342,16 @@ module.exports.hostBookings = async (req, res) => {
         .populate("user")
         .sort({ checkIn: 1 });
 
-    res.render("bookings/index.ejs", { bookings, panelTitle: "Bookings on Your Listings", isHostPanel: true });
+    const stats = {
+        total: bookings.length,
+        confirmed: bookings.filter((b) => b.status === "confirmed").length,
+        pending: bookings.filter((b) => b.status === "pending").length,
+        revenue: bookings
+            .filter((b) => b.status === "confirmed")
+            .reduce((sum, b) => sum + b.totalPrice, 0),
+    };
+
+    res.render("bookings/host-panel.ejs", { bookings, stats });
 };
 
 // POST /bookings/:bookingId/cancel

@@ -1,20 +1,12 @@
 <% layout("/layouts/boilerplate") %>
 
   <div class="container mt-4 mb-5">
-    <h2 class="fw-bold mb-4">
-      <%= typeof panelTitle !=="undefined" ? panelTitle : "My Trips" %>
-    </h2>
+    <h2 class="fw-bold mb-4">My Trips</h2>
 
     <% const statusColors={ pending: "warning" , confirmed: "success" , cancelled: "secondary" }; %>
 
       <% if (bookings.length===0) { %>
-        <p class="text-muted">
-          <% if (typeof isHostPanel !=="undefined" && isHostPanel) { %>
-            No bookings on your listings yet.
-            <% } else { %>
-              You haven't booked any trips yet. <a href="/listings">Explore listings</a>.
-              <% } %>
-        </p>
+        <p class="text-muted">You haven't booked any trips yet. <a href="/listings">Explore listings</a>.</p>
         <% } %>
 
           <div class="row g-3">
@@ -37,18 +29,13 @@
                         <p class="text-secondary small mb-1">
                           <%= booking.checkIn.toDateString() %> &rarr; <%= booking.checkOut.toDateString() %>
                         </p>
-                        <% if (typeof isHostPanel !=="undefined" && isHostPanel && booking.user) { %>
-                          <p class="text-secondary small mb-1"><i class="bi bi-person-fill me-1"></i>
-                            <%= booking.guestName || booking.user.username %>
+                        <% if (booking.roomNumber) { %>
+                          <p class="text-secondary small mb-1"><i class="bi bi-door-closed-fill me-1"></i>Room <%=
+                              booking.roomNumber %>
                           </p>
                           <% } %>
-                            <% if (booking.roomNumber) { %>
-                              <p class="text-secondary small mb-1"><i class="bi bi-door-closed-fill me-1"></i>Room <%=
-                                  booking.roomNumber %>
-                              </p>
-                              <% } %>
-                                <p class="fw-medium small mb-0">&#8377;<%= booking.totalPrice.toLocaleString("en-IN") %>
-                                </p>
+                            <p class="fw-medium small mb-0">&#8377;<%= booking.totalPrice.toLocaleString("en-IN") %>
+                            </p>
                       </div>
                     </div>
                   </div>
