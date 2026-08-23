@@ -60,12 +60,17 @@ async function importCityHotels(ownerId, cityKey) {
         throw new Error(`Unknown city "${cityKey}". Valid options: ${Object.keys(CITY_CONFIGS).join(", ")}`);
     }
 
-    const apiKey = process.env.GOOGLE_PLACES_API_KEY;
+    // .trim() guards against invisible trailing whitespace/newlines that
+    // can sneak into environment variable values (e.g. pasted into a
+    // hosting dashboard) — a stray character here silently breaks the
+    // request URL and Google rejects it as INVALID_REQUEST.
+    const apiKey = (process.env.GOOGLE_PLACES_API_KEY || "").trim();
     if (!apiKey) {
         const err = new Error("GOOGLE_PLACES_API_KEY is missing. Add it to your .env file.");
         err.isConfigError = true;
         throw err;
     }
+    console.log(`[placesImport] Using API key of length ${apiKey.length}, starts with "${apiKey.slice(0, 6)}"`);
 
     const query = encodeURIComponent(config.searchQuery);
     let url = `${PLACES_TEXT_SEARCH_URL}?query=${query}&key=${apiKey}`;
@@ -78,6 +83,7 @@ async function importCityHotels(ownerId, cityKey) {
         const data = await res.json();
 
         if (data.status !== "OK" && data.status !== "ZERO_RESULTS") {
+            console.error(`[placesImport] Google Places request failed. status=${data.status} error_message=${data.error_message} url=${url.replace(apiKey, "REDACTED")}`);
             throw new Error(`Google Places error: ${data.status} ${data.error_message || ""}`);
         }
 
