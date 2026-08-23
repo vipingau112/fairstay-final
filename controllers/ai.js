@@ -34,11 +34,17 @@ module.exports.chat = async (req, res) => {
 
         const reply = await askGemini(prompt, CHAT_SYSTEM_PROMPT);
         res.json({ reply });
-    } catch (err) {
+       } catch (err) {
         console.error("AI chat error:", err.message);
         if (err.isConfigError) {
             return res.status(503).json({
                 error: "AI chatbot isn't configured yet. Add GEMINI_API_KEY to your .env file.",
+            });
+        }
+        const status = err.response?.status;
+        if (status === 503 || status === 429) {
+            return res.status(503).json({
+                error: "The assistant is a bit busy right now — please try sending that again in a few seconds.",
             });
         }
         res.status(500).json({ error: "The AI assistant is unavailable right now. Please try again." });

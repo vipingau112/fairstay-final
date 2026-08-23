@@ -35,15 +35,36 @@ async function askGemini(userPrompt, systemInstruction = "") {
         body.systemInstruction = { parts: [{ text: systemInstruction }] };
     }
 
-    const { data } = await axios.post(`${GEMINI_URL}?key=${apiKey}`, body, {
-        headers: { "Content-Type": "application/json" },
-        timeout: 20000,
-    });
+    // Gemini's free-tier "flash" models occasionally return a transient 503
+    // ("model overloaded, try again") that has nothing to do with our
+    // config — a single quick retry smooths this over instead of showing
+    // the user a broken chatbot for what's usually a one-second hiccup.
+    const MAX_ATTEMPTS = 2;
+    let lastErr;
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+        try {
+            const { data } = await axios.post(`${GEMINI_URL}?key=${apiKey}`, body, {
+                headers: { "Content-Type": "application/json" },
+                timeout: 20000,
+            });
 
-    const text =
-        data?.candidates?.[0]?.content?.parts?.map((p) => p.text).join("\n") ||
-        "";
-    return text.trim();
+            const text =
+                data?.candidates?.[0]?.content?.parts?.map((p) => p.text).join("\n") ||
+                "";
+            return text.trim();
+        } catch (err) {
+            lastErr = err;
+            const status = err.response?.status;
+            const isOverloaded = status === 503 || status === 429;
+            if (isOverloaded && attempt < MAX_ATTEMPTS) {
+                console.warn(`[geminiClient] Got ${status} from Gemini, retrying once...`);
+                await new Promise((resolve) => setTimeout(resolve, 1500));
+                continue;
+            }
+            throw err;
+        }
+    }
+    throw lastErr;
 }
 
 /**
