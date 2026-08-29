@@ -1,61 +1,140 @@
+/* ============================================================
+   FairStay — Royal Gold/Blue theme
+   Design tokens
+   ============================================================ */
 :root {
   --royal-blue: #1B3B6D;
   --royal-blue-dark: #10254A;
   --royal-blue-light: #2E5090;
   --royal-gold: #C9A227;
   --royal-gold-light: #E9D8A6;
+  --royal-cream: #FDF6E3;
+  --royal-ink: #21262E;
+  --royal-ink-soft: #5B6572;
+
+  --shadow-sm: 0 1px 3px rgba(16, 37, 74, 0.06), 0 1px 2px rgba(16, 37, 74, 0.04);
+  --shadow-md: 0 6px 20px rgba(16, 37, 74, 0.08), 0 2px 6px rgba(16, 37, 74, 0.05);
+  --shadow-lg: 0 16px 40px rgba(16, 37, 74, 0.14), 0 4px 12px rgba(16, 37, 74, 0.08);
+
+  --radius-md: 0.85rem;
+  --radius-lg: 1.1rem;
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* ============================================================
+   Base
+   ============================================================ */
 body {
-  font-family: "Plus Jakarta Sans", sans-serif !important;
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif !important;
   background-color: #ffffff;
+  color: var(--royal-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Headings borrow a warm serif for character — used sparingly, body
+   copy stays in Plus Jakarta Sans so long text never feels precious. */
+h1, h2, .display-heading {
+  font-family: "Fraunces", Georgia, serif !important;
+  font-optical-sizing: auto;
+  letter-spacing: -0.01em;
+  color: var(--royal-blue-dark);
+}
+
+h3, h4, h5, h6 {
+  font-family: "Plus Jakarta Sans", sans-serif !important;
+  letter-spacing: -0.01em;
+}
+
+/* Signature touch: a short gold rule under primary section headings —
+   a small nod to a wax-seal / ledger-ribbon feel that ties back to the
+   "Royal" identity without being loud about it. */
+h2.section-heading::after,
+h2.fw-bold::after {
+  content: "";
+  display: block;
+  width: 46px;
+  height: 3px;
+  margin-top: 0.5rem;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--royal-gold), var(--royal-gold-light));
+}
+
+a {
+  color: var(--royal-blue);
+  transition: color 0.15s var(--ease);
+}
+a:hover {
+  color: var(--royal-blue-dark);
+}
+
+/* Visible, on-brand focus ring everywhere — accessibility, not decoration */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+.btn:focus-visible {
+  outline: 2px solid var(--royal-gold);
+  outline-offset: 2px;
+}
+
+/* Custom scrollbar, matched to theme (Chromium/WebKit) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #f4f1ea;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--royal-blue-light);
+  border-radius: 999px;
+  border: 2px solid #f4f1ea;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--royal-blue);
 }
 
 .sticky-top {
   position: sticky !important;
   top: 0;
   z-index: 1030;
-  background-color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: saturate(180%) blur(8px);
+  box-shadow: 0 1px 0 rgba(16, 37, 74, 0.06);
 }
 
-/* Royal Gold/Blue brand theme button */
-.add-btn {
-  background-color: var(--royal-blue) !important;
-  border: 1px solid var(--royal-gold) !important;
-  padding-left: 2rem !important;
-  padding-right: 2rem !important;
-  color: #fff !important;
+/* ============================================================
+   Buttons
+   ============================================================ */
+.btn {
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease), background-color 0.15s var(--ease);
+}
+.btn:active {
+  transform: translateY(0);
 }
 
-.add-btn:hover {
-  background-color: var(--royal-blue-dark) !important;
-}
-
-.brand-text {
-  color: var(--royal-blue) !important;
-}
-
-.text-royal {
-  color: var(--royal-blue) !important;
-}
-
-.text-gold {
-  color: var(--royal-gold) !important;
-}
-
-.bg-royal {
-  background-color: var(--royal-blue) !important;
-}
-
+.add-btn,
 .btn-royal {
   background-color: var(--royal-blue) !important;
   border: 1px solid var(--royal-gold) !important;
   color: #fff !important;
+  box-shadow: var(--shadow-sm);
 }
-
+.add-btn:hover,
 .btn-royal:hover {
   background-color: var(--royal-blue-dark) !important;
   color: #fff !important;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.add-btn {
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
 }
 
 .btn-outline-royal {
@@ -63,9 +142,97 @@ body {
   border: 1px solid var(--royal-blue) !important;
   color: var(--royal-blue) !important;
 }
-
 .btn-outline-royal:hover {
   background-color: var(--royal-blue) !important;
   color: #fff !important;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
+.btn-dark {
+  border-radius: var(--radius-md);
+  transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+.btn-dark:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ============================================================
+   Brand utility colors
+   ============================================================ */
+.brand-text,
+.text-royal {
+  color: var(--royal-blue) !important;
+}
+.text-gold {
+  color: var(--royal-gold) !important;
+}
+.bg-royal {
+  background-color: var(--royal-blue) !important;
+}
+.bg-cream {
+  background-color: var(--royal-cream) !important;
+}
+
+/* ============================================================
+   Cards — used across listings, bookings, profile
+   ============================================================ */
+.card {
+  border-radius: var(--radius-lg);
+  transition: box-shadow 0.2s var(--ease), transform 0.2s var(--ease);
+}
+
+/* Interactive cards (listing tiles, booking tiles) lift gently on
+   hover so the grid feels tactile without being flashy. */
+a .card:hover,
+.card.card-interactive:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-3px);
+}
+
+.shadow-sm {
+  box-shadow: var(--shadow-sm) !important;
+}
+
+/* ============================================================
+   Alerts / flash messages
+   ============================================================ */
+.alert {
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ============================================================
+   Badges / pills (status, GST, room number, etc.)
+   ============================================================ */
+.badge {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* ============================================================
+   Forms
+   ============================================================ */
+.form-control,
+.form-select {
+  border-radius: var(--radius-md);
+  border-color: #E4E7EC;
+  transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--royal-gold);
+  box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.18);
+}
+
+/* ============================================================
+   Motion sensitivity
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
