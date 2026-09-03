@@ -156,6 +156,29 @@ app.get("/admin/import-prayagraj-hotels", async (req, res) => {
     }
 });
 
+// TEMPORARY: deletes existing Prayagraj listings (which have broken/stale
+// image URLs from an earlier import) so they can be re-imported fresh
+// with corrected image URLs. Remove this route once you've used it.
+app.get("/admin/delete-prayagraj-hotels", async (req, res) => {
+    try {
+        if (!req.isAuthenticated()) {
+            req.flash("error", "Please log in first, then visit this link again.");
+            return res.redirect("/login");
+        }
+        const Listing = require("./models/listing.js");
+        const result = await Listing.deleteMany({
+            location: { $regex: /prayagraj|allahabad/i },
+        });
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        res.send(
+            `🗑️ Deleted ${result.deletedCount} Prayagraj listing(s). ` +
+            `Now visit <a href="${baseUrl}/admin/import-hotels/prayagraj">${baseUrl}/admin/import-hotels/prayagraj</a> to re-import them.`
+        );
+    } catch (err) {
+        res.status(500).send("Error deleting Prayagraj listings: " + err.message);
+    }
+});
+
 // 🚀 SMART LOCAL SEEDER: Automatically fetches real coordinates for existing locations
 app.get("/seed-local-db", async (req, res) => {
     try {
